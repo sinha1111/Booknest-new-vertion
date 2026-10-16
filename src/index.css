@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 36 33% 97%;
+    --foreground: 24 10% 10%;
+
+    --card: 36 30% 95%;
+    --card-foreground: 24 10% 10%;
+
+    --popover: 36 33% 97%;
+    --popover-foreground: 24 10% 10%;
+
+    --primary: 28 72% 45%;
+    --primary-foreground: 36 33% 97%;
+
+    --secondary: 36 20% 90%;
+    --secondary-foreground: 24 10% 20%;
+
+    --muted: 36 15% 92%;
+    --muted-foreground: 24 8% 50%;
+
+    --accent: 172 40% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 15% 88%;
+    --input: 30 15% 88%;
+    --ring: 28 72% 45%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 36 30% 95%;
+    --sidebar-foreground: 24 10% 10%;
+    --sidebar-primary: 28 72% 45%;
+    --sidebar-primary-foreground: 36 33% 97%;
+    --sidebar-accent: 36 20% 90%;
+    --sidebar-accent-foreground: 24 10% 20%;
+    --sidebar-border: 30 15% 88%;
+    --sidebar-ring: 28 72% 45%;
+
+    --warm-gold: 38 80% 55%;
+    --warm-brown: 24 30% 30%;
+    --cream: 40 40% 96%;
+    --teal: 172 40% 35%;
+    --burgundy: 350 50% 40%;
+
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Source Sans 3', sans-serif;
+  }
+
+  .dark {
+    --background: 220 15% 8%;
+    --foreground: 36 20% 92%;
+
+    --card: 220 15% 12%;
+    --card-foreground: 36 20% 92%;
+
+    --popover: 220 15% 12%;
+    --popover-foreground: 36 20% 92%;
+
+    --primary: 32 75% 50%;
+    --primary-foreground: 220 15% 8%;
+
+    --secondary: 220 12% 18%;
+    --secondary-foreground: 36 20% 85%;
+
+    --muted: 220 12% 16%;
+    --muted-foreground: 36 10% 55%;
+
+    --accent: 172 40% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+    --ring: 32 75% 50%;
+
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 36 20% 92%;
+    --sidebar-primary: 32 75% 50%;
+    --sidebar-primary-foreground: 220 15% 8%;
+    --sidebar-accent: 220 12% 18%;
+    --sidebar-accent-foreground: 36 20% 85%;
+    --sidebar-border: 220 12% 20%;
+    --sidebar-ring: 32 75% 50%;
+
+    --warm-gold: 38 75% 50%;
+    --warm-brown: 24 20% 65%;
+    --cream: 220 15% 15%;
+    --teal: 172 40% 45%;
+    --burgundy: 350 45% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .text-warm-gold {
+    color: hsl(var(--warm-gold));
+  }
+
+  .text-warm-brown {
+    color: hsl(var(--warm-brown));
+  }
+
+  .bg-cream {
+    background-color: hsl(var(--cream));
+  }
+
+  .text-teal {
+    color: hsl(var(--teal));
+  }
+
+  .text-burgundy {
+    color: hsl(var(--burgundy));
+  }
+
+  .gradient-warm {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--warm-gold)));
+  }
+
+  .gradient-page {
+    background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
+  }
+
+  /* Capacitor 8 SystemBars --safe-area-inset-* var dey; browser e env() kaj kore. Duto-r max nei. */
+  .pt-safe {
+    padding-top: max(3rem, calc(max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px)) + 1rem));
+  }
+
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

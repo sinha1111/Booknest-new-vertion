@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BookNest</string>
+    <string name="title_activity_main">BookNest</string>
+    <string name="package_name">com.booknest.app</string>
+    <string name="custom_url_scheme">com.booknest.app</string>
+</resources>

@@ -1,0 +1,7 @@
+# Supabase CLI config — shudhu edge function deploy er jonno.
+# project_id e apnar project ref boshan (Dashboard -> Project Settings -> General).
+# `supabase db push` / `db reset` ei shared project e chalabe NA.
+project_id = "dmcyeawqfhyrlodorohs"
+
+[functions.booknest-delete-account]
+verify_jwt = true
