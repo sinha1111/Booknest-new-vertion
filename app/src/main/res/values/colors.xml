@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="booknest_icon_background">#292E33</color>
+    <color name="booknest_splash_bg">#292E33</color>
+    <color name="booknest_window_bg">#292E33</color>
+</resources>

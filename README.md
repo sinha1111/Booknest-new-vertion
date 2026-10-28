@@ -1,101 +1,65 @@
-# BookNest (Supabase self-hosted backend version)
+# BookNest - Native Android (Kotlin + Jetpack Compose)
 
-Lovable theke clone kora. Ekhon apnar nijer Supabase project er **`booknest` schema** te kaj kore —
-onno 2ta app er table/policy/function/bucket er shathe kono mishamishi nei.
+Capacitor/WebView chhara puro native app. **Backend ager moto-i**: same Supabase project (`booknest` schema, RLS, storage bucket
+`booknest-avatars`, edge function `booknest-delete-account`). Kono SQL ba server side bodlano lage ni.
+Design (rong, layout, font, tab, card) web version er moto-i; shob page ager moto: Home, Explore, Write, Editor, Book Detail,
+Reader, Profile, Settings, Auth.
 
-## Setup (ei order e)
+## Build (ek command)
+Requirements: **Android Studio** (JDK 21 + SDK 36 shoho). Internet lagbe (prothom bar).
 
-### 1. Database
-Supabase Dashboard -> **SQL Editor** -> New query -> `supabase/booknest.sql` er pura content paste -> **Run**.
-(`supabase db push` / `db reset` chalabe na — shared project e onno app er migration history er shathe somossha hobe.)
-Dobara run korle kichu bhenge jay na (idempotent).
-
-### 2. Schema expose koro (khub important)
-Dashboard -> **Project Settings -> Data API** (ba API) -> **Exposed schemas** -> `booknest` **add** koro (age ja ache ta rekhe) -> Save.
-Eta na korle app e "schema must be one of the following" / 406 error ashbe.
-
-### 3. Environment
 ```
-cp .env.example .env
+powershell -ExecutionPolicy Bypass -File .\build-apk.ps1
 ```
-`.env` e `VITE_SUPABASE_URL` ar anon/publishable key dao (Project Settings -> API).
-**service_role key kokhono .env / frontend e dibe na.**
+Result: `BookNest.apk`. **Purono Capacitor BookNest app phone theke UNINSTALL kore** eta install koro (signature alada).
 
-### 4. Delete-account function
+Script ja kore: JDK/SDK khuje ney, font download kore (Playfair Display + Source Sans 3), Gradle wrapper ready kore
+(purono `android\` folder theke copy, na hole Gradle download kore), tarpor build kore.
+
+Android Studio diye korte chaile: folder ta **Open** koro -> Sync -> Run. (Prothome ekbar `build-apk.ps1` chalaile wrapper/font ready hoye jay.)
+
+## Play Store AAB (ager app er update)
+Same package (`com.tricosoft.booknest`) ar **same keystore** lagbe, noile Play Store update nibe na.
+1. `keystore.properties.example` copy kore `keystore.properties` koro, ager upload keystore er value dao.
+2. ```
+   powershell -ExecutionPolicy Bypass -File .\build-apk.ps1 -Aab -VersionCode 7 -VersionName 7.0.0
+   ```
+   (`VersionCode` ager release er cheye BORO hote hobe.)
+3. `BookNest.aab` Play Console e upload koro.
+
+## Supabase config
+`supabase.properties` e URL ar publishable key ache (build er shomoy app e boshe). `service_role` / secret key kokhono ekhane dibe na.
+
+## E2EE draft encryption
+Web er shathe byte-compatible: web e likha encrypted draft app e khole, app e likha draft web e khole (same passphrase / recovery code).
+AES-256-GCM, PBKDF2-SHA256 (600k), HKDF. Passphrase/key server e jay na; session token Android Keystore diye encrypted.
+Algorithm ta web crypto (WebCrypto) er shathe cross-test kora hoyeche.
+
+## Folder
 ```
-npm i -g supabase          # ba npx supabase
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
-supabase functions deploy booknest-delete-account
-```
-Production e: `supabase secrets set ALLOWED_ORIGIN=https://your-site.com`
-
-### 5. Auth settings (project-wide, shared!)
-Dashboard -> Authentication -> URL Configuration: BookNest er URL ta **Redirect URLs** e add koro
-(onno app er URL muche felo na). Email confirmation on thakle signup er por mail confirm kore sign in korte hobe.
-
-### 6. Run
-```
-npm install
-npm run dev     # http://localhost:8080
+app/src/main/java/com/booknest/app/
+  data/     Supabase REST client (Auth, PostgREST, Storage, Functions), models, repository
+  crypto/   E2EE (VaultCrypto)
+  state/    app state (session, vault, theme, language, toast)
+  ui/       theme, components, navigation, screens/
+app/src/main/res/  icon (booknest-v2 theke), splash, themes
 ```
 
-## Kon jinish alada, kon jinish shared
+## Jodi build fail kore
+Error er pura output ta pathao (Gradle er `e:` line gulo). Ei code ta Kotlin compiler diye ami chalate pari ni, tai chhoto-khato
+compile error ashte pare - oigulo fix kore dibo.
 
-| Jinish | Status |
-|---|---|
-| Tables, RLS policies, functions, triggers | **Alada** — `booknest` schema |
-| Avatar storage | **Alada** — `booknest-avatars` bucket, nijer policy |
-| Edge function | **Alada nam** — `booknest-delete-account` |
-| Browser session | **Alada** — storage key `booknest-auth` |
-| `auth.users` (email + password login) | **Shared** — Supabase er nijom, project-e ekta-i user table |
-| Auth settings (Site URL, email template, SMTP, rate limit) | **Shared** |
+## Device support (minSdk)
+`minSdk 24` (Android 7+), ager Capacitor release er moto. Tai ager release e je device gulo support korto, ekhon-o korbe.
+AAB te native debug symbol table dewa ache (Play Console er "no debug symbols" warning er jonno).
 
-**Shared login er mane:** je email diye onno app e account ache, oi email+password diye BookNest e sign in korle chole —
-BookNest e tar notun alada profile toiri hoy (data mishe na). Onno app er user ra BookNest e automatic dekha jay na
-(profile tokhon-i toiri hoy jokhon se BookNest e login kore), ar `auth.users` e kono trigger lagano hoyni, tai onno app er signup e kichu hoy na.
-Jodi login-o puropuri alada chao, tahole alada Supabase project lagbe — eta Supabase er limitation.
+## Play Console: "native code, no debug symbols" warning
+Eta sudhu ekta suggestion (release block kore na). Karon: Compose er bhitore ekta AndroidX native lib ache (`libandroidx.graphics.path.so`),
+jar debug info AndroidX nije-i strip kore dey, tai symbol file toiri kora jay na. App er nijer kono native code nei.
+Warning ta ignore korte paro. Chaile native lib bad dite paro (optional, kom risk):
+`.\build-apk.ps1 -Aab -NoNative -VersionCode 7 -VersionName 7.0.0`
+Jodi kono screen e `UnsatisfiedLinkError` crash hoy, `-NoNative` chhara abar build koro.
 
-Account delete: shudhu BookNest er data muchhe, `auth.users` er user ke na (noile onno app er account-o jeto).
-
-## Security
-
-- Shob table e RLS on; column-level grant — user nijer `user_id`, like/comment/read counter, follower count bodlate pare na (DB trigger maintain kore).
-- Reading history shudhu owner dekhe; likes/follows shudhu nijer; published book ar tar comment public.
-- Avatar: sudhu jpg/png/webp, max 2MB (bucket level e enforce), listing shudhu nijer folder.
-- `replace_chapters` atomic — save fail korle chapter hariye jay na.
-- Service-role key kothao frontend e nei; `.env` gitignored.
-
-## End-to-end encryption (draft)
-
-- **Ki encrypt hoy:** unpublished book er chapter title + content. Browser e AES-256-GCM diye encrypt hoy, server e shudhu ciphertext jay.
-- **Key:** random 256-bit key; ota "vault passphrase" (PBKDF2-SHA256, 600k) ar ekta **recovery code** diye wrap kore `user_keys` table e rakha hoy.
-  Passphrase/recovery code/key server e kokhono jay na. Login password theke alada.
-- **Ki encrypt hoy NA:** book er title/description/genre (list e dekhate hoy), ar **published** book (public hobar jonno-i; publish korle chapter plain hoy — DB trigger encrypted chapter publish hote dey na).
-- **Hariye gele:** passphrase **ar** recovery code duto-i hariye gele draft uddhar kora jabe na (eta E2EE er nature).
-- Dashboard theke tumi/Supabase admin draft chapter porte parbe na — ciphertext dekhbe.
-
-## Verify (SQL Editor e)
-```sql
-select tablename, rowsecurity from pg_tables where schemaname = 'booknest';           -- shob true
-select * from pg_policies where schemaname = 'booknest';
-select id, public, file_size_limit from storage.buckets where id = 'booknest-avatars';
-```
-Supabase Dashboard -> Advisors -> Security Advisor ও ekbar check koro.
-
-## Remove korte chaile
-`supabase/booknest_uninstall.sql` (age bucket empty koro).
-
-## Android build (Capacitor 8)
-Requirements: **Node 22+**, **Android Studio Otter (2025.2.1+)** (JDK 21 + SDK 36 shoho).
-
-Test APK:
-```
-powershell -ExecutionPolicy Bypass -File .\build-android.ps1
-```
-Play Store AAB (signed, R8 on):
-1. Ekbar keystore banao: `keytool -genkey -v -keystore booknest-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias booknest`
-2. `keystore.properties.example` copy kore `keystore.properties` koro, value boshao.
-3. `powershell -ExecutionPolicy Bypass -File .\build-android.ps1 -Aab -VersionCode 2 -VersionName 1.1` (protibar VersionCode barao)
-
-Icon `assets/` ar `android-res/` theke ashe.
+## Privacy Policy
+`https://app-privacy-center.blogspot.com/2026/08/booknest.html` - Login page, Sign Up page ar Settings (Legal + niche footer) e link ache.
+URL bodlate: `app/build.gradle.kts` er `PRIVACY_URL`.
